@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Image Display</title>
+</head>
+<body>
+
+    <center>
+        <h1>WebSocket Image Display</h1>
+        <div id="image-container"></div>
+        {{ cfg }}
+    </center>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        // WebSocket connection
+        const socket = new WebSocket(`ws://${window.location.host}/ws`);
+
+        // Handle incoming messages
+        socket.onmessage = function(event) {
+            const imageDataJSON = event.data;
+            const imageData = JSON.parse(imageDataJSON);
+            const imageContainer = document.getElementById("image-container");
+            // Clear previous images
+            imageContainer.innerHTML = "";
+            imageData.imgs.forEach((base64Image, index) => {
+                const imgElement = document.createElement("img");
+                imgElement.src = "data:image/jpeg;base64," + base64Image;
+                imgElement.alt = `Image ${index + 1}`;
+                
+                // Append the image element to the container
+                imageContainer.appendChild(imgElement);
+            });
+        };
+
+        // Handle WebSocket errors
+        socket.onerror = function (error) {
+            console.error(`WebSocket Error: ${error}`);
+        };
+
+        // Handle WebSocket connection opened
+        socket.onopen = function (event) {
+            console.log("WebSocket opened");
+        };
+
+        // Handle WebSocket connection closed
+        socket.onclose = function (event) {
+            console.log("WebSocket closed");
+        };
+    </script>
+</body>
+</html>
